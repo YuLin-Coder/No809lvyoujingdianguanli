@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LvxingsheLiuyanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.lvxingshe_id as lvxingsheId
+        ,a.yonghu_id as yonghuId
+        ,a.lvxingshe_liuyan_content as lvxingsheLiuyanContent
+        ,a.reply_content as replyContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LvxingsheLiuyanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,lvxingshe.lvxingshe_name as lvxingsheName
+        ,lvxingshe.lvxingshe_types as lvxingsheTypes
+        ,lvxingshe.lvxingshe_weizhi as lvxingsheWeizhi
+        ,lvxingshe.lvxingshe_photo as lvxingshePhoto
+        ,lvxingshe.lvxingshe_jingdian as lvxingsheJingdian
+        ,lvxingshe.lvxingshe_new_money as lvxingsheNewMoney
+        ,lvxingshe.lvxingshe_content as lvxingsheContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.sex_types as sexTypes
+
+        FROM lvxingshe_liuyan  a
+        left JOIN lvxingshe lvxingshe ON a.lvxingshe_id = lvxingshe.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.lvxingsheId != null">
+                and a.lvxingshe_id = #{params.lvxingsheId}
+            </if>
+            <if test="params.yonghuId != null">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.lvxingsheLiuyanContent != '' and params.lvxingsheLiuyanContent != null and params.lvxingsheLiuyanContent != 'null' ">
+                and a.lvxingshe_liuyan_content like CONCAT('%',#{params.lvxingsheLiuyanContent},'%')
+            </if>
+            <if test=" params.replyContent != '' and params.replyContent != null and params.replyContent != 'null' ">
+                and a.reply_content like CONCAT('%',#{params.replyContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.insertTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.insertTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+
+            <if test=" params.lvxingsheName != '' and params.lvxingsheName != null and params.lvxingsheName != 'null' ">
+                and lvxingshe.lvxingshe_name like CONCAT('%',#{params.lvxingsheName},'%')
+            </if>
+            <if test="params.lvxingsheTypes != null">
+                and lvxingshe.lvxingshe_types = #{params.lvxingsheTypes}
+            </if>
+
+            <if test=" params.lvxingsheWeizhi != '' and params.lvxingsheWeizhi != null and params.lvxingsheWeizhi != 'null' ">
+                and lvxingshe.lvxingshe_weizhi like CONCAT('%',#{params.lvxingsheWeizhi},'%')
+            </if>
+            <if test=" params.lvxingsheJingdian != '' and params.lvxingsheJingdian != null and params.lvxingsheJingdian != 'null' ">
+                and lvxingshe.lvxingshe_jingdian like CONCAT('%',#{params.lvxingsheJingdian},'%')
+            </if>
+            <if test="params.lvxingsheNewMoneyStart != null ">
+                <![CDATA[  and lvxingshe.lvxingshe_new_money >= #{params.lvxingsheNewMoneyStart}   ]]>
+            </if>
+            <if test="params.lvxingsheNewMoneyEnd != null ">
+                <![CDATA[  and lvxingshe.lvxingshe_new_money <= #{params.lvxingsheNewMoneyEnd}   ]]>
+            </if>
+            <if test=" params.lvxingsheContent != '' and params.lvxingsheContent != null and params.lvxingsheContent != 'null' ">
+                and lvxingshe.lvxingshe_content like CONCAT('%',#{params.lvxingsheContent},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and yonghu.sex_types = #{params.sexTypes}
+            </if>
+
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>
